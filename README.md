@@ -1,0 +1,4 @@
+schoolManager
+=============
+
+school management
