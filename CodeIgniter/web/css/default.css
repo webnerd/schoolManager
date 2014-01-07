@@ -34,14 +34,18 @@ p.footer{
     margin-bottom: 1em;
 }
 
-table .even, table .even
+table .even,table tbody tr:nth-of-type(1)
+{
+    background-color: #7ab5d3;
+}
+
+table .odd, table tbody tr:nth-of-type(2)
 {
     background-color: #d4d4d4;
 }
 
-table .odd, table .odd
-{
-    background-color: #7ab5d3;
+table th{
+    background-color: #f8f8f8;
 }
 
 table tr td
