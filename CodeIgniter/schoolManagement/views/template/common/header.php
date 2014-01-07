@@ -20,7 +20,6 @@
     <span><a href="/<?php echo $_SESSION['username'];?>"> HOME</a></span>
     <span><a href="/library"> LIBRARY</a></span>
     <span><a href="/logout"> LOGOUT</a></span>
-
 </div>
 
 <div id="container">
