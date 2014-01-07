@@ -59,6 +59,8 @@ $route['discussion-group/(.*)'] = "welcome/discussionGroup";
 $route['discussion-listing/(.*)'] = "welcome/discussionListing/$1";
 $route['discussion/(.*)'] = "welcome/discussion/$1";
 
+$route['library'] = "welcome/library";
+
 $route['logout'] = "welcome/logout";
 $route['(.*)'] = "welcome/index/$1";
 

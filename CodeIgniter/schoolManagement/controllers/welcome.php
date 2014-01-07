@@ -8,7 +8,7 @@ class Welcome extends MY_Controller
         $this->load->model('Database');
         $this->load->helper('utility');
         //$this->output->cache(1440);
-        //$this->output->enable_profiler(TRUE);
+        $this->output->enable_profiler(TRUE);
     }
 
     /**
@@ -308,6 +308,14 @@ class Welcome extends MY_Controller
         $structure['content'] = 'studentAttendance';
         $this->load_structure($structure);
     }
+
+    public function library()
+    {
+        $this->data['booksInLibrary'] = $this->Database->getBooksInLibrary($_SESSION['schoolId']);
+        $structure['content'] = 'booksInLibrary';
+        $this->load_structure($structure);
+    }
+
 }
 
 /* End of file welcome.php */

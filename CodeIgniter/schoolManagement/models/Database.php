@@ -319,8 +319,41 @@ class Database extends CI_Model
         return $this->getResultArray($query);
     }
 
-    public function getDiscussionData1($discussionId)
+    public function getLibraryBySchoolId($schoolId)
     {
+        $this->db->select('id')->from(' library_master')
+            ->where(array('school_id'=>$schoolId,'status'=>'1'));
+            return $this->db->get()->row_array();
+    }
+    public function getAllocatedBooks($libraryId)
+    {
+        $this->db->distinct();
+            $this->db->select('book_borrower_mapping.book_store_id')->from('book_borrower_mapping')
+            ->join('library_book_mapping','book_borrower_mapping.book_store_id = library_book_mapping.book_store_id')
+            ->where(array('library_book_mapping.library_master_id'=>$libraryId));
+            $query = $this->db->get();
+            $bookStore = $this->getResultArray($query);
 
+        $bookStoreIds = array();
+
+        foreach($bookStore as $book)
+        {
+            $bookStoreIds[]=$book['book_store_id'];
+        }
+        return $bookStoreIds;
+    }
+
+    public function getBooksInLibrary($schoolId)
+    {
+        $library = $this->getLibraryBySchoolId($schoolId);
+        $libraryId = $library['id'];
+        $bookStoreIds = $this->getAllocatedBooks($libraryId);
+        $this->db->select('library_book_mapping.rack_number,library_book_mapping.row_number,book_store.*')->from('library_book_mapping')
+            ->join('book_store','book_store.id = library_book_mapping.book_store_id')
+            ->where(array('library_book_mapping.library_master_id'=>$libraryId))
+            ->where_not_in('book_store.id',$bookStoreIds);
+        $query = $this->db->get();
+        return $this->getResultArray($query);
     }
 }
+
