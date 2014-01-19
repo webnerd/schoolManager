@@ -42,7 +42,7 @@ class Database extends CI_Model
 	}
 	public function getMembersOfHouse($houseSoeTitle)
 	{
-		$this->db->select('house.*,user.username,user.name as user_name')->from('house')
+		$this->db->select('house.*,user.id as user_id,user.username,user.name as user_name')->from('house')
                  ->join('house_user_mapping','house.id = house_user_mapping.house_id')
                  ->join('user', 'user.id = house_user_mapping.user_id')
                  ->where(array('house.seo_title' => $houseSoeTitle));

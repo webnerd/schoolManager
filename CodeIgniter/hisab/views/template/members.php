@@ -1,20 +1,29 @@
 <div id="container">
-	
-	<?php if(!empty($_SESSION['username'])){ ?>
-		<h1>Welcome <?php echo $_SESSION['username'];?></h1>
-	<?php } else { ?>
-		<h1>Welcome to Hisab.com!</h1>
-	<?php } ?>
-	<h1><a href="/expenditure/<?php echo $data[0]['seo_title']; ?>/">Expenditure</a></h1>
-	<div id="body">
-	<ul>
-	<?php foreach($data as $house){?>
-		<li>
-			<span class="title"></span><span class="data"><a href="/<?php echo $house['username']; ?>/"><?php echo ucwords($house['user_name']); ?></a></span>
-		</li>
-	<?php } ?>
-	</ul>
-	</div>
 
-	<p class="footer">Page rendered in <strong>{elapsed_time}</strong> seconds</p>
-</div>
+	<h1> Members of <?php echo $data[0]['seo_title']; ?></h1>
+
+
+        <div class="large-6 columns">
+            <ul class="side-nav">
+                <?php foreach($data as $house){?>
+                <li>
+                    <span class="title"></span><span class="data"><a href="/<?php echo $house['username']; ?>/"><?php echo ucwords($house['user_name']); ?></a></span>
+                </li>
+                <?php } ?>
+            </ul>
+        </div>
+
+        <div class="large-6 columns">
+            <a href="#" data-dropdown="drop" class="button dropdown">Expenditure</a>
+            <ul id="drop" data-dropdown-content class="f-dropdown">
+                <li>
+                    <a href="/expenditure/view/<?php echo $data[0]['seo_title']; ?>/">View Expenditure</a>
+                </li>
+
+                <li>
+                    <a href="/expenditure/add/<?php echo $data[0]['seo_title']; ?>/">Add Expenditure</a>
+                </li>
+            </ul>
+        </div>
+
+	</div>

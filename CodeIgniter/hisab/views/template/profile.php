@@ -1,20 +1,12 @@
-<div id="container">
-	
-	<?php if(!empty($_SESSION['username'])){ ?>
-		<h1>Welcome <?php echo $_SESSION['username'];?></h1>
-	<?php } else { ?>
-		<h1>Welcome to Hisab.com!</h1>
-	<?php } ?>
-	
-	<div id="body">
-	<ul>
-	<?php foreach($data as $house){?>
-		<li>
-			<span class="title"></span><span class="data"><a href="/members/<?php echo $house['seo_title']; ?>"><?php echo $house['seo_title']; ?></a></span>
-		</li>
-	<?php } ?>
-	</ul>
-	</div>
 
-	<p class="footer">Page rendered in <strong>{elapsed_time}</strong> seconds</p>
-</div>
+
+    <div class="large-6 columns">
+    <a href="#" data-dropdown="drop" class="button dropdown">Select House</a><br>
+    <ul id="drop" data-dropdown-content class="f-dropdown">
+        <?php foreach($data as $house){?>
+        <li>
+            <a href="/members/<?php echo $house['seo_title']; ?>"><?php echo $house['seo_title']; ?></a>
+        </li>
+        <?php } ?>
+    </ul>
+    </div>

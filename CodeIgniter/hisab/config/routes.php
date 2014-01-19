@@ -40,7 +40,8 @@
 
 $route['logout'] = "welcome/logout";
 $route['members/(.+)'] = "welcome/members/$1";
-$route['expenditure/(.+)'] = "welcome/expenditure/$1";
+$route['expenditure/view/(.+)'] = "welcome/viewExpenditure/$1";
+$route['expenditure/add/(.+)'] = "welcome/addExpenditure/$1";
 $route['(.+)'] = "welcome/profile";
 $route['default_controller'] = "welcome";
 $route['404_override'] = '';

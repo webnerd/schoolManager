@@ -22,6 +22,7 @@ class Welcome extends MY_Controller {
     {
         parent::__construct();
         $this->load->model('Database');
+        $this->load->helper('utility');
         //$this->output->cache(1440);
         $this->output->enable_profiler(TRUE);
     }
@@ -57,8 +58,15 @@ class Welcome extends MY_Controller {
 		$structure['content'] = 'members';
         $this->load_structure($structure);
 	}
-	
-	public function expenditure($houseSeoTitle)
+
+    public function addExpenditure($houseSeoTitle)
+    {
+        var_dump($_POST);
+        $this->data['members'] = $this->Database->getMembersOfHouse($houseSeoTitle);
+        $structure['content'] = 'addExpenditureForm';
+        $this->load_structure($structure);
+    }
+	public function viewExpenditure($houseSeoTitle)
 	{
 		$date  = array();
 		
@@ -80,16 +88,17 @@ class Welcome extends MY_Controller {
             $date['endDate'] = date('Y-m-d');
         }
 		
-		$items = $this->Database->getItemsBoughtForHouse($houseSeoTitle,$date);
+		$this->data['items'] = $this->Database->getItemsBoughtForHouse($houseSeoTitle,$date);
 		
 		$itemList = array();
-		foreach($items as $item)
+		foreach($this->data['items'] as $item)
 		{
 			$itemList[] = $item['id'];
 		}
-		$this->data['data'] = $this->Database->getDistributionForItemList($itemList);
-		$this->data['members'] = $this->Database->getMembersOfHouse($houseSeoTitle);
-		var_dump($this->data);
+		$this->data['data'] = perUserItemCostDistribution($this->Database->getDistributionForItemList($itemList));
+		$this->data['members'] = formatMemberArray($this->Database->getMembersOfHouse($houseSeoTitle));
+        $structure['content'] = 'expenditure';
+        $this->load_structure($structure);
 	}
 	
 	public function logout()
