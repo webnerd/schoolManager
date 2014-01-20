@@ -61,8 +61,50 @@ class Welcome extends MY_Controller {
 
     public function addExpenditure($houseSeoTitle)
     {
-        var_dump($_POST);
         $this->data['members'] = $this->Database->getMembersOfHouse($houseSeoTitle);
+        $expenditureData = $this->input->post();
+
+        if(!empty($expenditureData))
+        {
+            $house = $this->Database->getHouseIdByHouseTitle($houseSeoTitle);
+            $itemDetail = array(
+                'name' => $expenditureData['item_name'],
+                'price' => $expenditureData['item_price'],
+                'owner_id' => $_SESSION['user_id'],
+                'buyer_user_id' => $expenditureData['who_paid'],
+                'house_id' => $house['id'],
+                'purchase_date' => $expenditureData['item_purchase_date'],
+            );
+
+            $this->db->trans_start();
+            $itemId = $this->Database->createItem($itemDetail);
+            $contributionDetails = array();
+            $perPersonContribution = ceil($expenditureData['item_price']/count($expenditureData['member']));
+            foreach($this->data['members'] as $key=>$member)
+            {
+                $contributionDetails[$key] =
+                    array(
+                            'item_id' => $itemId,
+                            'user_id' =>$member['user_id'],
+                            'contribution_amount' => ((in_array($member['user_id'],$expenditureData['member']))?$perPersonContribution:0),
+                    );
+            }
+
+            $this->Database->createContributionForHouseMembers($contributionDetails);
+            $this->db->trans_complete();
+
+            if ($this->db->trans_status() === FALSE)
+            {
+                $this->data['transaction']['status'] =  false;
+                $this->data['transaction']['statusMsg'] =  'Transaction Failed!';
+            }
+            else
+            {
+                $this->data['transaction']['status'] =  true;
+                $this->data['transaction']['statusMsg'] =  'Transaction finised successfully.';
+            }
+        }
+
         $structure['content'] = 'addExpenditureForm';
         $this->load_structure($structure);
     }

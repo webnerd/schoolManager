@@ -80,4 +80,22 @@ class Database extends CI_Model
 		$query = $this->db->get();
         return $this->getResultArray($query);
 	}
+
+    public function getHouseIdByHouseTitle($houseSeoTitle)
+    {
+        $this->db->select('house.id')
+            ->where( array('seo_title' => $houseSeoTitle) );
+        return $this->db->get('house')->row_array();
+    }
+    public function createItem($itemData)
+    {
+        $this->db->insert('item', $itemData);
+        return $this->db->insert_id();
+    }
+
+    public function createContributionForHouseMembers($contributionDetails)
+    {
+        $this->db->insert_batch('item_user_mapping', $contributionDetails);
+        return $this->db->affected_rows();
+    }
 }
