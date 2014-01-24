@@ -1,3 +1,4 @@
+<script src="/web/foundation-5.0.2/js/custom.js"></script>
 <script src="/web/foundation-5.0.2/js/modernizr.js"></script>
 <script src="/web/foundation-5.0.2/js/foundation.min.js"></script>
 <script src="/web/foundation-5.0.2/js/foundation/foundation.topbar.js"></script>
