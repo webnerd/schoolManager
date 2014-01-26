@@ -40,6 +40,9 @@
     */
 
     $route['logout']                       = "welcome/logout";
+    $route['login|login/']                 = "welcome/login";
+    $route['registration']                 = "welcome/registerUser";
+    $route['invite/(.+)']                  = "welcome/invite/$1";
     $route['members/(.+)']                 = "welcome/members/$1";
     $route['expenditure/view/(.+)']        = "welcome/viewExpenditure/$1";
     $route['expenditure/add/(.+)']         = "welcome/addExpenditure/$1";

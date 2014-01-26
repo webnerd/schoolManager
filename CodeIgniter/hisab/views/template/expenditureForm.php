@@ -13,7 +13,7 @@
         <p><?php echo $transaction['statusMsg'];?></p>
     </div>
 <?php } ?>
-<form id="expenditure" class="create expenditure" action="/expenditure/<?php echo isset($itemDetail)?"update/$houseName/".$itemDetail['id']:"add/$houseName/";?>/" method="post" data-abide>
+<form id="expenditure" class="create expenditure" action="/expenditure/<?php echo isset($itemDetail)?"update/$houseName/".$itemDetail['id']:"add/$houseName";?>/" method="post" data-abide>
     <div class="row">
         <div class="large-8 columns">
             <label>On what did you spend ? <small>required</small></label>
@@ -52,12 +52,13 @@
     <div id="members" class="row">
         <div class="large-12 columns">
             <label>Select Members involved <small>required</small></label>
+            <p><small class="error">Please select atleast one member.</small></p>
             <?php foreach($members as $key=>$member){?>
             <div class="large-<?php echo ceil(12/count($members));?>">
             <input <?php if(isset($itemContributionDetail)){if(in_array($member['user_id'],$itemContributionDetail)){ echo'checked=checked';}}?> id="checkbox<?php echo $key;?>" type="checkbox" name="member[]" value="<?php echo $member['user_id'];?>"><label for="checkbox<?php echo $key;?>"><?php echo ucwords($member['user_name']);?></label>
             </div>
             <?php }?>
-            <small class="error">Please select atleast one member.</small>
+            
         </div>
     </div>
     <div class="row">

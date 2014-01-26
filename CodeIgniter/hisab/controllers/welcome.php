@@ -38,13 +38,57 @@
             }
             else
             {
-                $input['data'] = $this->input->get();
-                $result        = $this->Database->getUserInfo($input['data']);
-                if (!empty($result))
+                $structure['content'] = 'registrationForm';
+                $this->load_structure($structure);
+            }
+        }
+
+        public function login ()
+        {
+            $loginData = $this->input->post();
+            $result    = $this->Database->getUserInfo($loginData);
+            print_r($result);
+            if (!empty($result))
+            {
+                $_SESSION['user_id']  = $result['id'];
+                $_SESSION['username'] = $result['username'];
+                header('Location: /' . $result['username'] . '/');
+            }
+            else
+            {
+                $structure['content'] = 'registrationForm';
+                $this->load_structure($structure);
+            }
+        }
+
+        public function registerUser ()
+        {
+            if (isset($_SESSION['user_id']) && !empty($_SESSION['user_id']))
+            {
+                header('Location: /' . $_SESSION['username'] . '/');
+            }
+            else
+            {
+                $registrationData = $this->input->post();
+                if (!empty($registrationData))
                 {
-                    $_SESSION['user_id']  = $result['id'];
-                    $_SESSION['username'] = $result['username'];
-                    header('Location: /' . $result['username'] . '/');
+                    $userData['name']     = $registrationData['user_name'];
+                    $userData['email_id'] = $registrationData['user_email'];
+                    $userData['password'] = md5($registrationData['user_password']);
+                    $userData['status']   = 1;
+                    $userData['username'] = str_replace(' ', '_', $registrationData['user_name']);
+
+                    $userId = $this->Database->createUser($userData);
+
+                    $_SESSION['user_id']  = $userId;
+                    $_SESSION['username'] = $userData['username'];
+
+                    header('Location: /' . $_SESSION['username'] . '/');
+                }
+                else
+                {
+                    $structure['content'] = 'registrationForm';
+                    $this->load_structure($structure);
                 }
             }
         }
@@ -58,12 +102,14 @@
 
         public function members ($houseSeoTitle)
         {
-            $this->data['data']   = $this->Database->getMembersOfHouse($houseSeoTitle);
-            $structure['content'] = 'members';
+            $this->data['data']       = $this->Database->getMembersOfHouse($houseSeoTitle);
+            $structure['content']     = 'members';
+            $this->data['houseName']  = $houseSeoTitle;
+            $this->data['activeView'] = 'members';
             $this->load_structure($structure);
         }
 
-        public function createItemUserContributionMapping($expenditureData,$members,$itemId)
+        public function createItemUserContributionMapping ($expenditureData, $members, $itemId)
         {
             $contributionDetails = array();
             if (isset($expenditureData['member']) && count($expenditureData['member']) > 0)
@@ -111,7 +157,7 @@
                 $this->db->trans_start();
                 $itemId = $this->Database->createItem($itemDetail);
                 $this->Database->upsertTag($itemDetail);
-                $this->createItemUserContributionMapping($expenditureData,$this->data['members'],$itemId);
+                $this->createItemUserContributionMapping($expenditureData, $this->data['members'], $itemId);
                 $this->db->trans_complete();
 
                 if ($this->db->trans_status() === FALSE)
@@ -126,26 +172,28 @@
                 }
             }
 
-            $this->data['houseName'] = $houseSeoTitle;
-            $structure['content'] = 'expenditureForm';
+
+            $this->data['houseName']  = $houseSeoTitle;
+            $this->data['activeView'] = 'add';
+            $structure['content']     = 'expenditureForm';
             $this->load_structure($structure);
         }
 
-        public function editExpenditure($houseSeoTitle,$itemId)
+        public function editExpenditure ($houseSeoTitle, $itemId)
         {
-            $this->data['members'] = formatMemberArray($this->Database->getMembersOfHouse($houseSeoTitle));
+            $this->data['members']    = formatMemberArray($this->Database->getMembersOfHouse($houseSeoTitle));
             $this->data['itemDetail'] = $this->Database->getItemData($itemId);
-            $itemContributionDetail= $this->Database->getItemContributionData($itemId);
-            foreach($itemContributionDetail as $item)
+            $itemContributionDetail   = $this->Database->getItemContributionData($itemId);
+            foreach ($itemContributionDetail as $item)
             {
                 $this->data['itemContributionDetail'][] = $item['user_id'];
             }
             $this->data['houseName'] = $houseSeoTitle;
-            $structure['content'] = 'expenditureForm';
+            $structure['content']    = 'expenditureForm';
             $this->load_structure($structure);
         }
 
-        public function updateExpenditure($houseSeoTitle,$itemId)
+        public function updateExpenditure ($houseSeoTitle, $itemId)
         {
             $this->data['members'] = $this->Database->getMembersOfHouse($houseSeoTitle);
             $expenditureData       = $this->input->post();
@@ -159,9 +207,9 @@
                 );
 
                 $this->db->trans_start();
-                $this->Database->updateItem($itemDetail,$itemId);
+                $this->Database->updateItem($itemDetail, $itemId);
                 $this->Database->deleteContributionForHouseMembers($itemId);
-                $this->createItemUserContributionMapping($expenditureData,$this->data['members'],$itemId);
+                $this->createItemUserContributionMapping($expenditureData, $this->data['members'], $itemId);
                 $this->db->trans_complete();
 
                 if ($this->db->trans_status() === FALSE)
@@ -178,6 +226,7 @@
 
             header('Location: /expenditure/view/' . $houseSeoTitle . '/');
         }
+
         public function viewExpenditure ($houseSeoTitle)
         {
             $date = array();
@@ -197,7 +246,7 @@
             }
             else
             {
-                $date['endDate'] = date('Y-m-d');
+                $date['endDate'] = date('Y-m-t',strtotime('today')); // Get Last day of month
             }
 
             $this->data['items'] = $this->Database->getItemsBoughtForHouse($houseSeoTitle, $date);
@@ -207,16 +256,48 @@
             {
                 $itemList[] = $item['id'];
             }
-            $this->data['data']    = perUserItemCostDistribution($this->Database->getDistributionForItemList($itemList));
-            $this->data['members'] = formatMemberArray($this->Database->getMembersOfHouse($houseSeoTitle));
-            $this->data['houseName'] = $houseSeoTitle;
-            $structure['content']  = 'expenditure';
+            $this->data['data']       = perUserItemCostDistribution($this->Database->getDistributionForItemList($itemList));
+            $this->data['members']    = formatMemberArray($this->Database->getMembersOfHouse($houseSeoTitle));
+            $this->data['houseName']  = $houseSeoTitle;
+            $this->data['activeView'] = 'view';
+            $structure['content']     = 'expenditure';
             $this->load_structure($structure);
+        }
+
+        public function invite ($houseSeoTitle)
+        {
+            $inviteData = $this->input->post();
+
+            if (!empty($inviteData))
+            {
+                $userData = $this->Database->getUserIdByEmail($inviteData['emailId']);
+                if (!empty($userData))
+                {
+                    $house = $this->Database->getHouseIdByHouseTitle($houseSeoTitle);
+                    $this->Database->inviteMember($house['id'], $userData['id']);
+                    $returnData['error'] = false;
+                    $returnData['msg']   = 'Invitation sent successfully!';
+                }
+                else
+                {
+                    $returnData['error'] = true;
+                    $returnData['msg']   = 'User does not exist!';
+                }
+
+                echo json_encode($returnData);
+            }
+            else
+            {
+                $this->data['houseName'] = $houseSeoTitle;
+                $structure['content']    = 'inviteForm';
+                $this->load_structure($structure);
+            }
         }
 
         public function logout ()
         {
             session_destroy();
+            header('Location: /');
         }
     }
 

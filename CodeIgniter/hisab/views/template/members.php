@@ -13,7 +13,7 @@
             </ul>
         </div>
 
-        <div class="large-6 columns">
+        <!--div class="large-6 columns">
             <a href="#" data-dropdown="drop" class="button dropdown">Expenditure</a>
             <ul id="drop" data-dropdown-content class="f-dropdown">
                 <li>
@@ -24,6 +24,6 @@
                     <a href="/expenditure/add/<?php echo $data[0]['seo_title']; ?>/">Add Expenditure</a>
                 </li>
             </ul>
-        </div>
+        </div-->
 
 	</div>

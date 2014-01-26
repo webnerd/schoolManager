@@ -5,7 +5,7 @@
     <ul id="drop" data-dropdown-content class="f-dropdown">
         <?php foreach($data as $house){?>
         <li>
-            <a href="/members/<?php echo $house['seo_title']; ?>"><?php echo $house['seo_title']; ?></a>
+            <a href="/expenditure/view/<?php echo $house['seo_title']; ?>"><?php echo $house['seo_title']; ?></a>
         </li>
         <?php } ?>
     </ul>

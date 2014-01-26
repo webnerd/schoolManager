@@ -24,14 +24,26 @@ class Database extends CI_Model
         }
 		return $result;
     }
-	
-	public function getUserInfo($user_info)
+
+    public function createUser($userData)
+    {
+        $this->db->insert('user', $userData);
+        return $this->db->insert_id();
+    }
+	public function getUserInfo($userInfo)
     {
         $this->db->select('id,username,name')
-                 ->where(array('username' => $user_info['username'] , 'password'=>md5($user_info['pass'])));
+                 ->where(array('email_id' => $userInfo['user_email'] , 'password'=>md5($userInfo['user_password'])));
         return $this->db->get('user')->row_array();
     }
-	
+
+    public function getUserIdByEmail($emailId)
+    {
+        $this->db->select('id')
+            ->where(array('email_id' => $emailId));
+        return $this->db->get('user')->row_array();
+    }
+
 	public function getHouseByUserId($userId)
 	{
 		$this->db->select('house.id,house.name,house.address,house.seo_title')->from('house')
@@ -54,7 +66,7 @@ class Database extends CI_Model
 	public function getItemsBoughtForHouse($houseSoeTitle,$date)
 	{
 	
-		$whereCondition = array('house.seo_title' => $houseSoeTitle);
+		$whereCondition = array('house.seo_title' => $houseSoeTitle, 'settlement_status' => 0);
 
         if( isset($date['endDate']) && !empty($date['endDate']) )
         {
@@ -75,11 +87,16 @@ class Database extends CI_Model
 	
 	public function getDistributionForItemList($itemList)
 	{
-		$this->db->select('item_user_mapping.*')->from('item_user_mapping')
-				->where_in('item_user_mapping.item_id',$itemList)
-				->order_by('item_user_mapping.user_id');
-		$query = $this->db->get();
-        return $this->getResultArray($query);
+		if(!empty($itemList))
+        {
+            $this->db->select('item_user_mapping.*')->from('item_user_mapping')
+                ->where_in('item_user_mapping.item_id',$itemList)
+                ->order_by('item_user_mapping.user_id');
+            $query = $this->db->get();
+            return $this->getResultArray($query);
+        }
+        return array();
+
 	}
 
     public function getHouseIdByHouseTitle($houseSeoTitle)
@@ -116,7 +133,7 @@ class Database extends CI_Model
         {
             $this->db->insert('tags', array('name' =>$itemDetail['name'], 'frequency' => 1));
         }
-        return true;
+        return $this->db->affected_rows();
     }
 
     public function getItemData($itemId)
@@ -138,4 +155,11 @@ class Database extends CI_Model
         return $this->db->affected_rows();
     }
 
+    public function inviteMember($houseId,$userId)
+    {
+        $this->db->get_where('house_user_mapping', array('house_id' =>$houseId,'user_id'=>$userId));
+        if($this->db->affected_rows() == 0)
+        $this->db->insert('house_user_mapping', array('house_id' =>$houseId,'user_id'=>$userId, 'status' => 0));
+        return $this->db->affected_rows();
+    }
 }
