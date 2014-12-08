@@ -284,7 +284,7 @@
                     $returnData['msg']   = 'User does not exist!';
                 }
 
-                echo json_encode($returnData);
+                echo json_encode($returnData);exit;
             }
             else
             {
